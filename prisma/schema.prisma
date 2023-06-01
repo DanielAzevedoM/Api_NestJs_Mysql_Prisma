@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id String @id @default(uuid())
+  email String @unique
+  isMasterAccount Boolean @default(false)
+  isAdmin Boolean @default(false)
+  isDeleted Boolean @default(false)
+  password String
+  person Person? @relation(fields: [personId], references: [id])
+  personId String? @unique
+  generalProductInfo GeneralProductInfo?
+
+  @@map("Accounts")
+}
+
+model Person {
+  id String @id @default(uuid())
+  name String 
+  cpf String
+  employee Boolean @default(false)
+  gender String
+  selfie String? 
+  account Account?
+  adress Adress?
+  category Category?
+  product Product?
+  generalProductInfo GeneralProductInfo?
+    
+  @@map("Persons")
+}
+
+model Adress {
+  id String @id @default(uuid())
+  adress String
+  city String
+  state String
+  postalCode Int
+  country String
+  person Person? @relation(fields: [personId], references: [id])
+  personId String? @unique
+
+  @@map("Adresses")
+}
+
+model Category {
+  id String @id @default(uuid())
+  name String
+  person Person? @relation(fields: [personId], references: [id])
+  personId String? @unique
+  created_at DateTime
+  product Product?
+  generalProductInfo GeneralProductInfo?
+
+  @@map("Categories")
+}
+
+model Product {
+  id String @id @default(uuid())
+  name String
+  price Int
+  created_at DateTime
+  category Category? @relation(fields: [categoryId], references: [id])
+  categoryId String? @unique
+  person Person? @relation(fields: [personId], references: [id])
+  personId String @unique
+  generalProductInfo GeneralProductInfo?
+  
+  @@map("Products")
+}
+
+model GeneralProductInfo {
+  id String @id @default(uuid())
+  admin Account? @relation(fields: [adminId], references: [id])
+  adminId String @unique
+  person Person? @relation(fields: [personId], references: [id]) 
+  personId String @unique   
+  personName String
+  category Category? @relation(fields: [categoryId], references: [id]) 
+  categoryId String @unique
+  product Product?  @relation(fields: [productId], references: [id]) 
+  productId String @unique
+  created_at DateTime
+}
+
+
